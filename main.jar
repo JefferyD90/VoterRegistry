@@ -79,7 +79,24 @@ public class VoterRegistrationForm extends Application {
         Scene scene = new Scene(form, 500, 500);
         primaryStage.setTitle("Voter Registration Form");
 
-        submitButton.setOnAction(event -> {
+        submitButton.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirm Submission");
+                alert.setHeaderText("Please confirm the information to be submitted");
+                alert.setContentText("First Name: " + firstNameField.getText() + 
+                                     "\nLast Name: " + lastNameField.getText() + 
+                                     "\nPhone Number: " + phoneNumberField.getText() +
+                                     "\nAddress: " + addressField.getText() +
+                                     "\nZip Code: " + zipCodeField.getText() +
+                                     "\nIdentification Method: " + identificationMethodField.getValue() +
+                                     "\nIdentification Number: " + identificationNumberField.getText() +
+                                     "\nParty: " + partyField.getValue());
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                
             String firstName = firstNameField.getText();
             String lastName = lastNameField.getText();
             String phoneNumber = phoneNumberField.getText();
@@ -93,8 +110,33 @@ public class VoterRegistrationForm extends Application {
             String voterGuid = UUID.randomUUID().toString();
             LocalDateTime dateRegistered = LocalDateTime.now();
             LocalDateTime expirationDate = dateRegistered.plusYears(5);
+                }
+            }
+        });
+        submitButton.setOnAction(event -> {
 
-            // Add logic to get city and state based on zip code
+
+String zipCode = zipCodeField.getText();
+String query = "SELECT city, state FROM zip_codes WHERE zip_code = ?";
+
+try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(query)) {
+    ps.setString(1, zipCode);
+    ResultSet rs = ps.executeQuery();
+    if (rs.next()) {
+        String city = rs.getString("city");
+        String state = rs.getString("state");
+
+        // Set the city and state fields based on the information from the database
+        cityField.setText(city);
+        stateField.setText(state);
+    } else {
+        // No match found in the database
+    }
+} catch (SQLException e) {
+    // Handle SQL exceptions
+}
+
             
             Connection conn = null;
             PreparedStatement stmt = null;
