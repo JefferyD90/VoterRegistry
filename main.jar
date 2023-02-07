@@ -78,7 +78,41 @@ public class VoterRegistrationForm extends Application {
         Scene scene = new Scene(form, 500, 500);
         primaryStage.setTitle("Voter Registration Form");
 
-        submitButton.setOnAction(new EventHandler<ActionEvent>() {
+
+/*
+Assuming you have a database table named "zip_codes" with the following structure:
+
+zip_code  |  city  |  state
+---------------------------
+12345     |  CityA |  StateA
+23456     |  CityB |  StateB
+...       |  ...   |  ...
+
+
+*/
+
+String zipCode = zipCodeField.getText();
+String query = "SELECT city, state FROM zip_codes WHERE zip_code = ?";
+
+try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS);
+     PreparedStatement ps = con.prepareStatement(query)) {
+    ps.setString(1, zipCode);
+    ResultSet rs = ps.executeQuery();
+    if (rs.next()) {
+        String city = rs.getString("city");
+        String state = rs.getString("state");
+
+        // Set the city and state fields based on the information from the database
+        cityField.setText(city);
+        stateField.setText(state);
+    } else {
+        // No match found in the database
+    }
+} catch (SQLException e) {
+    // Handle SQL exceptions
+}
+
+       submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -114,40 +148,6 @@ public class VoterRegistrationForm extends Application {
         });
         submitButton.setOnAction(event -> {
 
-/*
-Assuming you have a database table named "zip_codes" with the following structure:
-
-zip_code  |  city  |  state
----------------------------
-12345     |  CityA |  StateA
-23456     |  CityB |  StateB
-...       |  ...   |  ...
-
-
-*/
-
-String zipCode = zipCodeField.getText();
-String query = "SELECT city, state FROM zip_codes WHERE zip_code = ?";
-
-try (Connection con = DriverManager.getConnection(DB_URL, USER, PASS);
-     PreparedStatement ps = con.prepareStatement(query)) {
-    ps.setString(1, zipCode);
-    ResultSet rs = ps.executeQuery();
-    if (rs.next()) {
-        String city = rs.getString("city");
-        String state = rs.getString("state");
-
-        // Set the city and state fields based on the information from the database
-        cityField.setText(city);
-        stateField.setText(state);
-    } else {
-        // No match found in the database
-    }
-} catch (SQLException e) {
-    // Handle SQL exceptions
-}
-
-            
             Connection conn = null;
             PreparedStatement stmt = null;
             try {
