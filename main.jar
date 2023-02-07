@@ -1,0 +1,86 @@
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+import java.util.UUID;
+import java.util.Calendar;
+import java.util.TimeZone;
+import javax.swing.*;
+
+public class VoterRegistrationForm extends JFrame {
+  // Connection parameters
+  static final String DB_URL = "jdbc:postgresql://localhost:5432/voter_registration";
+  static final String USER = "postgres";
+  static final String PASS = "password";
+
+  // GUI components
+  private JTextField firstNameField;
+  private JTextField lastNameField;
+  private JTextField phoneNumberField;
+  private JTextField addressField;
+  private JTextField cityField;
+  private JTextField zipCodeField;
+  private JTextField stateField;
+  private JTextField votingPrecinctField;
+  private JTextField identificationMethodField;
+  private JTextField identificationNumberField;
+  private JTextField partyField;
+
+  public VoterRegistrationForm() {
+    // Set the title of the frame
+    setTitle("Voter Registration Form");
+
+    // Set the layout of the frame
+    setLayout(new GridLayout(12, 2));
+
+    // Add the first name label and field
+    add(new JLabel("First Name:"));
+    firstNameField = new JTextField();
+    add(firstNameField);
+
+    // Add the last name label and field
+    add(new JLabel("Last Name:"));
+    lastNameField = new JTextField();
+    add(lastNameField);
+
+    // Add the phone number label and field
+    add(new JLabel("Phone Number:"));
+    phoneNumberField = new JTextField();
+    add(phoneNumberField);
+
+    // Add the address label and field
+    add(new JLabel("Address:"));
+    addressField = new JTextField();
+    add(addressField);
+
+    // Add the city label and field
+    add(new JLabel("City:"));
+    cityField = new JTextField();
+    add(cityField);
+
+    // Add the zip code label and field
+    add(new JLabel("Zip Code:"));
+    zipCodeField = new JTextField();
+    add(zipCodeField);
+
+    // Add the state label and field
+    add(new JLabel("State:"));
+    stateField = new JTextField();
+    add(stateField);
+
+    // Add the voting precinct label and field
+    add(new JLabel("Voting Precinct:"));
+    votingPrecinctField = new JTextField();
+    add(votingPrecinctField);
+
+    // Add the identification method label and field
+    add(new JLabel("Identification Method:"));
+    identificationMethodField = new JTextField();
+    add(identificationMethodField);
+
+    // Add the identification number label and field
+    add(new JLabel("Identification Number:"));
+    identificationNumberField = new JTextField();
+    add(identificationNumberField);
+
+    // Add the party label and field
+    add(new JLabel("Party:")
