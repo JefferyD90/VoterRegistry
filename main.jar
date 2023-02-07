@@ -69,12 +69,15 @@ public class VoterRegistrationForm extends Application {
         form.add(partyLabel, 0, 7);
         TextField partyField = new TextField();
         form.add(partyField, 1, 7);
-
+        
         Button submitButton = new Button("Submit");
-        HBox hBox = new HBox(10);
-        hBox.setAlignment(Pos.BOTTOM_RIGHT);
-        hBox.getChildren().add(submitButton);
-        form.add(hBox, 1, 8);
+        HBox submitButtonContainer = new HBox(10);
+        submitButtonContainer.setAlignment(Pos.BOTTOM_RIGHT);
+        submitButtonContainer.getChildren().add(submitButton);
+        form.add(submitButtonContainer, 1, 8);
+
+        Scene scene = new Scene(form, 500, 500);
+        primaryStage.setTitle("Voter Registration Form");
 
         submitButton.setOnAction(event -> {
             String firstName = firstNameField.getText();
@@ -82,8 +85,8 @@ public class VoterRegistrationForm extends Application {
             String phoneNumber = phoneNumberField.getText();
             String address = addressField.getText();
             String zipCode = zipCodeField.getText();
-            String city = getCityFromZipCode(zipCode);
-            String state = getStateFromZipCode(zipCode);
+            String city = "";
+            String state = "";
             String identificationMethod = identificationMethodField.getText();
             String identificationNumber = identificationNumberField.getText();
             String party = partyField.getText();
@@ -91,43 +94,45 @@ public class VoterRegistrationForm extends Application {
             LocalDateTime dateRegistered = LocalDateTime.now();
             LocalDateTime expirationDate = dateRegistered.plusYears(5);
 
-        // Insert the data into the database
-        String sql = "INSERT INTO voters (voter_guid, first_name, last_name, phone_number, address, zip_code, identification_method, identification_number, party, date_registered, expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, voterGUID);
-        pstmt.setString(2, firstName);
-        pstmt.setString(3, lastName);
-        pstmt.setString(4, phoneNumber);
-        pstmt.setString(5, address);
-        pstmt.setString(6, zipCode);
-        pstmt.setString(7, identificationMethod);
-        pstmt.setString(8, identificationNumber);
-        pstmt.setString(9, party);
-        pstmt.setObject(10, now);
-        pstmt.setObject(11, expirationDate);
-        pstmt.executeUpdate();
+            // Add logic to get city and state based on zip code
+            
+            Connection conn = null;
+            PreparedStatement stmt = null;
+            try {
+                Class.forName("org.postgresql.Driver");
+                conn = DriverManager.getConnection(DB_URL, USER, PASS);
+                String sql = "INSERT INTO voters (voter_guid, first_name, last_name, phone_number, address, city, state, zip_code, identification_method, identification_number, party, date_registered, expiration_date) "
+                           + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                stmt = conn.prepareStatement(sql);
+                stmt.setString(1, voterGuid);
+                stmt.setString(2, firstName);
+                stmt.setString(3, lastName);
+                stmt.setString(4, phoneNumber);
+                stmt.setString(5, address);
+                stmt.setString(6, city);
+                stmt.setString(7, state);
+                stmt.setString(8, zipCode);
+                stmt.setString(9, identificationMethod);
+                stmt.setString(10, identificationNumber);
+                stmt.setString(11, party);
+                stmt.setObject(12, dateRegistered);
+                stmt.setObject(13, expirationDate);
+                stmt.executeUpdate();
+                System.out.println("Record inserted into voters table");
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (stmt != null) stmt.close();
+                    if (conn != null) conn.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
-        // Close the connection
-        conn.close();
-
-        // Clear the form fields
-        firstNameField.clear();
-        lastNameField.clear();
-        phoneNumberField.clear();
-        addressField.clear();
-        zipCodeField.clear();
-        identificationMethodField.clear();
-        identificationNumberField.clear();
-        partyField.clear();
-      } catch (SQLException e) {
-        e.printStackTrace();
-      }
-    });
-
-    Scene scene = new Scene(form, 400, 500);
-    primaryStage.setTitle("Voter Registration Form");
-    primaryStage.setScene(scene);
-    primaryStage.show();
+        primaryStage.setScene(scene);
+        primaryStage.show();
     }
 
     public static void main(String[] args) {
