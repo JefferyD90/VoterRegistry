@@ -115,6 +115,17 @@ public class VoterRegistrationForm extends Application {
         });
         submitButton.setOnAction(event -> {
 
+/*
+Assuming you have a database table named "zip_codes" with the following structure:
+
+zip_code  |  city  |  state
+---------------------------
+12345     |  CityA |  StateA
+23456     |  CityB |  StateB
+...       |  ...   |  ...
+
+
+*/
 
 String zipCode = zipCodeField.getText();
 String query = "SELECT city, state FROM zip_codes WHERE zip_code = ?";
